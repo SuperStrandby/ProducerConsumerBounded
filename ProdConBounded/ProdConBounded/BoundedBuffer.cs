@@ -2,11 +2,59 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProdConBounded
 {
-    class BoundedBuffer
+    public class BoundedBuffer
     {
+        private Queue<int> _queue;
+        private int _bufferSize;
+
+        public BoundedBuffer(int bufferSize)
+        {
+            _bufferSize = bufferSize;
+            _queue = new Queue<int>();
+        }
+
+        public bool IsFull()
+        {
+            return _queue.Count >= _bufferSize;
+        }
+
+        public bool IsEmpty()
+        {
+            return _queue.Count < 1;
+        }
+
+        public int Take()
+        {
+            lock (_queue)
+            {
+                while (_queue.Count == 0)
+                {
+                    Monitor.Wait(_queue);
+                }
+                int i = _queue.Dequeue();
+                Console.WriteLine("Consumer took {0} from buffer", i);
+                Monitor.PulseAll(_queue);
+                return i;
+            }
+        }
+
+        public void Put(int intForQueue)
+        {
+            lock (_queue)
+            {
+                while (IsFull())
+                {
+                    Monitor.Wait(_queue);
+                }
+                _queue.Enqueue(intForQueue);
+                Console.WriteLine("Producer added: {0} to buffer", intForQueue);
+                Monitor.PulseAll(_queue);
+            }
+        }
     }
 }
