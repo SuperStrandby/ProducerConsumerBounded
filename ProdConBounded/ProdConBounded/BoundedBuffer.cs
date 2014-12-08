@@ -36,10 +36,10 @@ namespace ProdConBounded
                 {
                     Monitor.Wait(_queue);
                 }
-                int i = _queue.Dequeue();
-                Console.WriteLine("Consumer took {0} from buffer", i);
+                int temp = _queue.Dequeue();
+                Console.WriteLine("Consumer took {0} from buffer", temp);
                 Monitor.PulseAll(_queue);
-                return i;
+                return temp;
             }
         }
 

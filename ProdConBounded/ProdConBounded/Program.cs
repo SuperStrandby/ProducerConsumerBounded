@@ -10,6 +10,11 @@ namespace ProdConBounded
     {
         static void Main(string[] args)
         {
+            BoundedBuffer buffer = new BoundedBuffer(10);
+            Consumer con = new Consumer(buffer, 20);
+            Producer prod = new Producer(buffer, 20);
+
+            Parallel.Invoke(prod.Run, con.Run);
         }
     }
 }
